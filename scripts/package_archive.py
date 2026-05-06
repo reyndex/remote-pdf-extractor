@@ -6,7 +6,6 @@ import stat
 import zipfile
 from pathlib import Path
 
-
 FIXED_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 
 

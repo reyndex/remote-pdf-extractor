@@ -173,6 +173,20 @@ DOCX uploads use the same call shape:
 curl ... --form "file=@resume.docx"
 ```
 
+You can also send a generic HTTP(S) download URL instead of uploading bytes:
+
+```bash
+curl --request POST \
+  --url "${FUNCTION_URL}" \
+  --user "${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}" \
+  --aws-sigv4 "aws:amz:${AWS_REGION}:lambda" \
+  --header "content-type: application/json" \
+  --header "x-amz-security-token: ${AWS_SESSION_TOKEN}" \
+  --data '{"file_url":"https://example.com/document.pdf"}'
+```
+
+If a multipart `file` and `file_url` are both present, the uploaded file takes priority.
+
 ## Notes
 
 - The Lambda handler entry is `main.handler` by default. `function/main.py` re-exports `handler` from `function/aws_handler.py`.

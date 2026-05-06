@@ -187,32 +187,34 @@ def _normalize_url(url: str) -> str:
     )
 
 
-def _combine_links(annotation_links: list[str], text_urls: list[str]) -> list[str]:
+def _combine_link_urls(
+    annotation_link_urls: list[str], text_urls: list[str]
+) -> list[str]:
     seen: set[str] = set()
-    combined_links: list[str] = []
-    for url in [*annotation_links, *text_urls]:
+    combined_link_urls: list[str] = []
+    for url in [*annotation_link_urls, *text_urls]:
         if not _is_real_url(url):
             continue
         normalized = _normalize_url(url)
         if normalized in seen:
             continue
         seen.add(normalized)
-        combined_links.append(normalized)
-    return combined_links
+        combined_link_urls.append(normalized)
+    return combined_link_urls
 
 
-def _extract_pdf_annotation_links(doc: pymupdf.Document) -> list[str]:
-    links: list[str] = []
+def _extract_pdf_annotation_link_urls(doc: pymupdf.Document) -> list[str]:
+    link_urls: list[str] = []
     for page in doc:
         for link in page.get_links():
             uri = link.get("uri")
             if uri:
-                links.append(uri)
-    return _unique_preserving_order(links)
+                link_urls.append(uri)
+    return _unique_preserving_order(link_urls)
 
 
-def _collect_docx_hyperlinks(archive: zipfile.ZipFile) -> list[str]:
-    links: list[str] = []
+def _collect_docx_hyperlink_urls(archive: zipfile.ZipFile) -> list[str]:
+    link_urls: list[str] = []
     for name in archive.namelist():
         if not name.endswith(".rels"):
             continue
@@ -225,8 +227,8 @@ def _collect_docx_hyperlinks(archive: zipfile.ZipFile) -> list[str]:
                 continue
             target = rel.attrib.get("Target", "")
             if target.startswith(EXTERNAL_URL_PREFIXES):
-                links.append(target)
-    return _unique_preserving_order(links)
+                link_urls.append(target)
+    return _unique_preserving_order(link_urls)
 
 
 def _check_docx_archive_size(archive: zipfile.ZipFile) -> None:
@@ -270,7 +272,7 @@ def _flatten_layout_tables(html_str: str) -> str:
 def _extract_pdf(file_bytes: bytes) -> tuple[str, list[str]]:
     with pymupdf.open(stream=file_bytes, filetype="pdf") as doc:
         markdown = pymupdf4llm.to_markdown(doc, show_progress=False)
-        return markdown, _extract_pdf_annotation_links(doc)
+        return markdown, _extract_pdf_annotation_link_urls(doc)
 
 
 def _extract_docx(file_bytes: bytes) -> tuple[str, list[str]]:
@@ -278,11 +280,11 @@ def _extract_docx(file_bytes: bytes) -> tuple[str, list[str]]:
     # harvesting; mammoth opens its own handle for decoding.
     with zipfile.ZipFile(io.BytesIO(file_bytes)) as archive:
         _check_docx_archive_size(archive)
-        links = _collect_docx_hyperlinks(archive)
+        link_urls = _collect_docx_hyperlink_urls(archive)
     result = mammoth.convert_to_html(io.BytesIO(file_bytes))
     html_flat = _flatten_layout_tables(result.value)
     markdown = markdownify.markdownify(html_flat, **MARKDOWNIFY_OPTIONS)
-    return markdown, links
+    return markdown, link_urls
 
 
 _FORMAT_EXTRACTORS = {
@@ -311,12 +313,14 @@ def _extract_for_format(
 
 
 def _extract_document(file_bytes: bytes, document_format: str) -> dict[str, Any]:
-    markdown, annotation_links = _extract_for_format(file_bytes, document_format)
+    markdown, annotation_link_urls = _extract_for_format(file_bytes, document_format)
 
-    haystack = "\n".join([markdown, *annotation_links])
+    haystack = "\n".join([markdown, *annotation_link_urls])
     return {
         "markdown": markdown,
-        "emails": _extract_emails(haystack),
-        "links": _combine_links(annotation_links, _extract_text_urls(markdown)),
-        "phones": _extract_phones(haystack),
+        "email_addresses": _extract_emails(haystack),
+        "link_urls": _combine_link_urls(
+            annotation_link_urls, _extract_text_urls(markdown)
+        ),
+        "phone_numbers": _extract_phones(haystack),
     }

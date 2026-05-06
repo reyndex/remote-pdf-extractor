@@ -171,12 +171,25 @@ if result["status"] == "error":
 
 data = result["data"]
 print("markdown chars:", len(data["markdown"]))
-print("emails:", data["emails"])
-print("links:", data["links"])
-print("phones:", data["phones"])
+print("email addresses:", data["email_addresses"])
+print("link URLs:", data["link_urls"])
+print("phone numbers:", data["phone_numbers"])
 ```
 
 DOCX uploads use the same shape, just swap the filename and content type (`application/vnd.openxmlformats-officedocument.wordprocessingml.document`). The server detects format from file magic bytes regardless of the declared content type.
+
+You can also send a generic HTTP(S) download URL instead of uploading bytes:
+
+```python
+response = httpx.post(
+    function_url,
+    json={"file_url": "https://example.com/document.pdf"},
+    headers={"Authorization": f"Bearer {token}"},
+    timeout=120,
+)
+```
+
+If a multipart `file` and `file_url` are both present, the uploaded file takes priority.
 
 ## Notes
 

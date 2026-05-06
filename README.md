@@ -1,6 +1,6 @@
 # Remote PDF Extractor
 
-Serverless function that extracts clean markdown plus structured contact info (emails, phone numbers, links) from PDF and DOCX uploads. Returns a JSON object the caller can pass straight to an LLM or to downstream parsing.
+Serverless function that extracts clean markdown plus structured contact info (email addresses, phone numbers, and link URLs) from PDF and DOCX uploads. Returns a JSON object the caller can pass straight to an LLM or to downstream parsing.
 
 Two deployment targets:
 
@@ -9,7 +9,22 @@ Two deployment targets:
 
 ## Response shape
 
-POST a PDF or DOCX as multipart form field `file`. Every response is HTTP 200 with a `status` + `data` envelope; clients distinguish by the `status` field.
+POST a PDF or DOCX as multipart form field `file`, or provide a generic HTTP(S) download URL in `file_url` as a JSON body or form field. When both are present, the multipart `file` upload is used. Every response is HTTP 200 with a `status` + `data` envelope; clients distinguish by the `status` field.
+
+Direct upload:
+
+```bash
+curl --form "file=@document.pdf" "$FUNCTION_URL"
+```
+
+Generic download URL:
+
+```bash
+curl \
+  --header "content-type: application/json" \
+  --data '{"file_url":"https://example.com/document.pdf"}' \
+  "$FUNCTION_URL"
+```
 
 On success, `data` is the extraction object:
 
@@ -18,9 +33,9 @@ On success, `data` is the extraction object:
   "status": "success",
   "data": {
     "markdown": "...",
-    "emails": ["foo@bar.com"],
-    "links": ["https://github.com/foo"],
-    "phones": ["+15551234567", "3365005405"]
+    "email_addresses": ["foo@bar.com"],
+    "link_urls": ["https://github.com/foo"],
+    "phone_numbers": ["+15551234567", "3365005405"]
   }
 }
 ```
@@ -40,16 +55,16 @@ Phone format: preserve leading `+` only when source contained it; otherwise retu
 
 - **PDF**: `pymupdf4llm.to_markdown` for the body, `pymupdf.page.get_links()` for annotation hyperlinks
 - **DOCX**: `mammoth.convert_to_html` → layout-table flatten via `BeautifulSoup` → `markdownify` for the body, plus a zipfile walk over `.rels` for hyperlinks
-- **Links**: annotation/zip-rels URIs unioned with `urlextract.find_urls(body)`, normalized to `https://...`, query string stripped, trailing slash stripped, `mailto:`/`tel:`/non-http schemes filtered out
-- **Emails**: regex over `body + raw annotation links`; the `\b` word boundary strips `mailto:` prefixes naturally
-- **Phones**: keep explicit `+` country codes, otherwise keep local numbers without adding a default region; spaces, hyphens, parentheses, and dots are stripped
+- **Link URLs**: annotation/zip-rels URIs unioned with `urlextract.find_urls(body)`, normalized to `https://...`, query string stripped, trailing slash stripped, `mailto:`/`tel:`/non-http schemes filtered out
+- **Email addresses**: regex over `body + raw annotation link URLs`; the `\b` word boundary strips `mailto:` prefixes naturally
+- **Phone numbers**: keep explicit `+` country codes, otherwise keep local numbers without adding a default region; spaces, hyphens, parentheses, and dots are stripped
 
 Format detection is by content signature, not by content type:
 
 - PDF must start with `%PDF-`
 - DOCX must be a ZIP archive containing `word/document.xml`
 
-Max upload size: 20 MB.
+Max upload/download size: 20 MB.
 
 ## Repo layout
 

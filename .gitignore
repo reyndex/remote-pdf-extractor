@@ -20,6 +20,7 @@ dist/
 *.egg-info/
 pip-wheel-metadata/
 .uv/
+uv.lock
 
 # Test and tooling caches
 .cache/

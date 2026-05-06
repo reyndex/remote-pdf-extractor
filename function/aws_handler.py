@@ -3,11 +3,17 @@ from __future__ import annotations
 import base64
 import binascii
 import json
-from email.parser import BytesParser
-from email.policy import default
 from typing import Any
 
-from core import error_payload, normalize_content_type, process_upload
+from core import MAX_FILE_SIZE, error_payload, normalize_content_type, process_upload
+from remote_file import RemoteFileError, download_file_url
+from request_payload import (
+    MISSING_FILE_MESSAGE,
+    POST_INSTRUCTIONS,
+    file_url_from_json_body,
+    file_url_from_urlencoded_body,
+    parse_multipart_upload,
+)
 
 
 def _lambda_response(payload: dict[str, Any]) -> dict[str, Any]:
@@ -59,33 +65,14 @@ def _decode_body(event: dict[str, Any]) -> bytes:
     return body.encode("utf-8")
 
 
-def _parse_multipart_file(
-    body: bytes, content_type: str
-) -> tuple[bytes | None, str | None]:
-    # Strip CRLF from the caller-supplied header value before splicing it into
-    # a synthetic MIME envelope; prevents header injection via Content-Type.
-    safe_content_type = content_type.replace("\r", "").replace("\n", "")
-    message = BytesParser(policy=default).parsebytes(
-        f"Content-Type: {safe_content_type}\r\nMIME-Version: 1.0\r\n\r\n".encode(
-            "utf-8"
+def _process_file_url(file_url: str) -> dict[str, Any]:
+    try:
+        file_bytes, content_type = download_file_url(
+            file_url, max_file_size=MAX_FILE_SIZE
         )
-        + body
-    )
-
-    if not message.is_multipart():
-        return None, None
-
-    for part in message.iter_parts():
-        if part.get_content_disposition() != "form-data":
-            continue
-
-        field_name = part.get_param("name", header="content-disposition")
-        if field_name != "file":
-            continue
-
-        return part.get_payload(decode=True) or b"", part.get_content_type()
-
-    return None, None
+    except RemoteFileError as exc:
+        return error_payload(str(exc))
+    return process_upload(file_bytes, content_type)
 
 
 def handler(event, _context):
@@ -93,11 +80,7 @@ def handler(event, _context):
         return _lambda_response(error_payload("Invalid request event"))
 
     if _request_method(event) != "POST":
-        return _lambda_response(
-            error_payload(
-                "Use POST to upload a PDF or DOCX as multipart form field 'file'"
-            )
-        )
+        return _lambda_response(error_payload(POST_INSTRUCTIONS))
 
     content_type = _header_value(event.get("headers"), "content-type")
     normalized_content_type = normalize_content_type(content_type)
@@ -107,14 +90,30 @@ def handler(event, _context):
         return _lambda_response(error_payload(str(exc)))
 
     if normalized_content_type == "multipart/form-data":
-        file_bytes, file_content_type = _parse_multipart_file(body, content_type)
-        if file_bytes is None:
-            return _lambda_response(
-                error_payload(
-                    "No file provided. Send a PDF or DOCX as multipart form "
-                    "field 'file'"
-                )
-            )
+        upload = parse_multipart_upload(body, content_type)
+        if upload.file_bytes is not None:
+            file_bytes = upload.file_bytes
+            file_content_type = upload.file_content_type
+        elif upload.file_url is not None:
+            return _lambda_response(_process_file_url(upload.file_url))
+        else:
+            return _lambda_response(error_payload(MISSING_FILE_MESSAGE))
+    elif normalized_content_type == "application/json":
+        try:
+            file_url = file_url_from_json_body(body)
+        except ValueError as exc:
+            return _lambda_response(error_payload(str(exc)))
+        if file_url is None:
+            return _lambda_response(error_payload(MISSING_FILE_MESSAGE))
+        return _lambda_response(_process_file_url(file_url))
+    elif normalized_content_type == "application/x-www-form-urlencoded":
+        try:
+            file_url = file_url_from_urlencoded_body(body)
+        except ValueError as exc:
+            return _lambda_response(error_payload(str(exc)))
+        if file_url is None:
+            return _lambda_response(error_payload(MISSING_FILE_MESSAGE))
+        return _lambda_response(_process_file_url(file_url))
     else:
         file_bytes = body
         file_content_type = content_type
