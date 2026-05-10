@@ -7,6 +7,7 @@ What this stack sets up:
 - A Lambda function that accepts PDF or DOCX uploads and returns extracted content
 - An IAM role and a CloudWatch log group for the Lambda
 - An IAM-authenticated Function URL
+- An optional SSM parameter containing the Lambda Function URL
 - An optional security group when VPC mode is enabled
 
 Terraform Cloud state:
@@ -54,6 +55,7 @@ No modules.
 | [aws_lambda_function.remote_pdf_extractor](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function) | resource |
 | [aws_lambda_function_url.remote_pdf_extractor](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lambda_function_url) | resource |
 | [aws_security_group.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
+| [aws_ssm_parameter.function_url](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_iam_policy_document.lambda_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_subnets.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets) | data source |
@@ -67,6 +69,7 @@ No modules.
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region for the Lambda function | `string` | `"us-west-2"` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Optional deployment label for tags. When empty, derive from TFC\_WORKSPACE\_NAME or fall back to shared. | `string` | `""` | no |
 | <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | Additional environment variables passed to the Lambda function | `map(string)` | `{}` | no |
+| <a name="input_function_url_ssm_parameter_name"></a> [function\_url\_ssm\_parameter\_name](#input\_function\_url\_ssm\_parameter\_name) | Optional SSM parameter name for storing the Lambda Function URL | `string` | `""` | no |
 | <a name="input_lambda_architecture"></a> [lambda\_architecture](#input\_lambda\_architecture) | Lambda CPU architecture | `string` | `"arm64"` | no |
 | <a name="input_lambda_handler"></a> [lambda\_handler](#input\_lambda\_handler) | Lambda handler entry point. Defaults to main.handler so AWS enters through the same shared router as GCP. | `string` | `"main.handler"` | no |
 | <a name="input_lambda_memory_mb"></a> [lambda\_memory\_mb](#input\_lambda\_memory\_mb) | Memory allocated to the Lambda function in MB | `number` | `1024` | no |

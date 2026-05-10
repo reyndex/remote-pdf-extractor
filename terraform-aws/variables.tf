@@ -74,6 +74,12 @@ variable "environment_variables" {
   default     = {}
 }
 
+variable "function_url_ssm_parameter_name" {
+  description = "Optional SSM parameter name for storing the Lambda Function URL"
+  type        = string
+  default     = ""
+}
+
 variable "vpc_id" {
   description = "Optional VPC ID for Lambda attachment. When empty, no VPC is used unless use_default_vpc is true."
   type        = string

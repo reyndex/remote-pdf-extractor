@@ -5,12 +5,13 @@ locals {
     local.workspace_name != "default" ? regex("[^-]+$", local.workspace_name) : "shared"
   )
 
-  resource_name_prefix       = trimspace(var.resource_name_prefix) != "" ? trimspace(var.resource_name_prefix) : "remote-pdf-extractor"
-  name_prefix                = local.resource_name_prefix
-  lambda_function_name       = local.name_prefix
-  lambda_log_group_name      = "/aws/lambda/${local.lambda_function_name}"
-  lambda_execution_role_name = "${local.name_prefix}-lambda-execution-role"
-  lambda_security_group_name = "${local.name_prefix}-lambda-security-group"
+  resource_name_prefix            = trimspace(var.resource_name_prefix) != "" ? trimspace(var.resource_name_prefix) : "remote-pdf-extractor"
+  name_prefix                     = local.resource_name_prefix
+  lambda_function_name            = local.name_prefix
+  lambda_log_group_name           = "/aws/lambda/${local.lambda_function_name}"
+  lambda_execution_role_name      = "${local.name_prefix}-lambda-execution-role"
+  lambda_security_group_name      = "${local.name_prefix}-lambda-security-group"
+  function_url_ssm_parameter_name = trimspace(var.function_url_ssm_parameter_name)
 
   lambda_package_zip         = abspath("${path.module}/../package/aws-lambda.zip")
   lambda_package_exists      = fileexists(local.lambda_package_zip)
