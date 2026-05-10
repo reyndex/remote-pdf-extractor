@@ -85,6 +85,10 @@ Run the package builder before Terraform whenever `function/` or `function/requi
 
 Commit the generated files under `package/` with the source change. Terraform does not run `pip`, create zip files, or use the archive provider during apply.
 
+## Terraform state
+
+The Terraform roots use Terraform Cloud remote state by default. If you deploy outside that setup, change the backend block before running `terraform init`.
+
 ## Start here
 
 - [Docs Index](./docs/README.md)

@@ -1,17 +1,17 @@
 variable "TFC_WORKSPACE_NAME" {
-  description = "Optional Terraform Cloud workspace name used to derive the environment"
+  description = "Optional workspace name used to derive the environment label"
   type        = string
   default     = ""
 }
 
 variable "resource_name_prefix" {
-  description = "Optional prefix for AWS resource names. Defaults to remote-pdf-extractor."
+  description = "Optional base name for account-scoped AWS resources. Defaults to remote-pdf-extractor."
   type        = string
   default     = ""
 }
 
 variable "environment" {
-  description = "Explicit environment name. When empty, derive from TFC_WORKSPACE_NAME or fall back to shared."
+  description = "Optional deployment label for tags. When empty, derive from TFC_WORKSPACE_NAME or fall back to shared."
   type        = string
   default     = ""
 }

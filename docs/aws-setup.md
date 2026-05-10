@@ -27,15 +27,16 @@ No Docker or ECR setup is required.
 ## Prerequisites
 
 - An AWS account
-- A Terraform Cloud workspace
-- One AWS IAM user or role for Terraform Cloud and invocation
+- Terraform CLI
+- Terraform Cloud access to the configured backend organization
+- One AWS IAM user or role for deployment and invocation
 - `python3` and `bash` available where you run `./scripts/build-function-zip.sh`
 
 ## IAM Identity
 
 Use one AWS IAM user or role for:
 
-- Terraform Cloud credentials
+- Terraform credentials
 - Lambda deployment
 - Signed Function URL invocation
 
@@ -47,13 +48,12 @@ Terraform creates the Lambda execution role separately. The execution role is us
 
 ## Terraform Cloud
 
-Use a workspace name like:
+This Terraform root uses Terraform Cloud remote state by default:
 
-```text
-remote-pdf-extractor-aws-development
-```
+- organization: `core-services`
+- workspace prefix: `remote-pdf-extractor-aws-`
 
-Set the working directory to:
+Run Terraform from:
 
 ```text
 terraform-aws/
@@ -65,7 +65,7 @@ Required Terraform variable:
 |---|---|
 | `aws_region` | `us-east-1` |
 
-Required Terraform Cloud environment variables:
+Required AWS credentials:
 
 | Variable | Value |
 |---|---|
@@ -78,7 +78,7 @@ Common optional variables:
 | Variable | Default |
 |---|---|
 | `resource_name_prefix` | `remote-pdf-extractor` |
-| `environment` | derived from workspace name |
+| `environment` | `shared`; optional tag label |
 | `python_runtime` | `python3.13` |
 | `lambda_handler` | `main.handler` |
 | `lambda_architecture` | `arm64` |
@@ -145,7 +145,7 @@ Requests must be signed with AWS Signature Version 4. The invoking identity need
 - `lambda:InvokeFunctionUrl`
 - `lambda:InvokeFunction`
 
-The same IAM identity used for Terraform Cloud can invoke the function.
+The invoking IAM identity can be the same identity used for deployment or a separate identity with invoke permissions.
 
 Set:
 

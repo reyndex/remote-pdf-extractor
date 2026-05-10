@@ -56,7 +56,7 @@ resource "google_storage_bucket" "function_source" {
   lifecycle {
     precondition {
       condition     = length(local.function_source_bucket) <= 63 && can(regex("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$", local.function_source_bucket))
-      error_message = "The function source bucket name must be 63 characters or fewer and contain only lowercase letters, numbers, and hyphens. Adjust resource_name_prefix or environment."
+      error_message = "The function source bucket name must be 63 characters or fewer and contain only lowercase letters, numbers, and hyphens. Adjust resource_name_prefix."
     }
   }
 }
@@ -124,7 +124,7 @@ resource "google_cloudfunctions2_function" "remote_pdf_extractor" {
   lifecycle {
     precondition {
       condition     = length(local.cloud_function_name) <= 63 && can(regex("^[a-z]([-a-z0-9]*[a-z0-9])?$", local.cloud_function_name))
-      error_message = "The Cloud Function name must be 63 characters or fewer, start with a lowercase letter, and contain only lowercase letters, numbers, and hyphens. Adjust resource_name_prefix or environment."
+      error_message = "The Cloud Function name must be 63 characters or fewer, start with a lowercase letter, and contain only lowercase letters, numbers, and hyphens. Adjust resource_name_prefix."
     }
   }
 }

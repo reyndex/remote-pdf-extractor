@@ -6,14 +6,15 @@ This guide covers the Google Cloud setup for the authenticated Cloud Functions d
 
 - An authenticated Cloud Functions 2nd gen HTTP function with configurable ingress
 - A source bucket for the function archive
-- One service account used for Terraform Cloud credentials, Cloud Build, runtime, and invocation
+- One service account used for Terraform credentials, Cloud Build, runtime, and invocation
 - A Cloud Run invoker IAM binding for that service account
 
 ## Prerequisites
 
 - A GCP project with billing enabled
 - A service account for deployment and invocation
-- A Terraform Cloud workspace
+- Terraform CLI
+- Terraform Cloud access to the configured backend organization
 
 Enable these APIs in the Cloud Console before the first Terraform run:
 
@@ -33,7 +34,7 @@ Terraform will enable the runtime APIs the stack needs, including:
 
 Create one service account and use it for:
 
-- Terraform Cloud `GOOGLE_CREDENTIALS`
+- Terraform credentials
 - Cloud Build source builds
 - Cloud Function runtime identity
 - Authenticated calls to the function
@@ -43,7 +44,7 @@ Grant these project roles to the service account:
 - Editor
 - Cloud Run Admin
 
-Create a JSON key for this service account. In Terraform Cloud, store the full JSON key in `GOOGLE_CREDENTIALS` and set the same service account email in `service_account_email`.
+Create a JSON key for this service account. For local Terraform, set `GOOGLE_APPLICATION_CREDENTIALS` to the key path. For Terraform Cloud or another remote runner, store the JSON key in that runner's secret storage and set the same service account email in `service_account_email`.
 
 Terraform grants this service account `roles/run.invoker` on the function so authenticated calls from this account are accepted.
 
@@ -65,13 +66,12 @@ The GCP zip keeps source files and `requirements.txt` at the archive root and st
 
 ## Terraform Cloud
 
-Use a workspace name like:
+This Terraform root uses Terraform Cloud remote state by default:
 
-```text
-remote-pdf-extractor-gcp-development
-```
+- organization: `core-services`
+- workspace prefix: `remote-pdf-extractor-gcp-`
 
-Set the working directory to:
+Run Terraform from:
 
 ```text
 terraform-gcp/
@@ -91,18 +91,18 @@ Common optional variables:
 | `gcp_region` | `us-central1` |
 | `ingress_settings` | `ALLOW_ALL` |
 | `resource_name_prefix` | `remote-pdf-extractor` |
-| `environment` | derived from workspace name |
+| `environment` | `shared`; optional resource label |
 | `max_instance_count` | `10` |
 | `min_instance_count` | `0` |
 | `available_memory` | `512Mi` |
 | `available_cpu` | `1` |
 | `timeout_seconds` | `120` |
 
-Required Terraform Cloud environment variable:
+Required local environment variable:
 
 | Variable | Value |
 |---|---|
-| `GOOGLE_CREDENTIALS` | full JSON contents of the `service_account_email` key |
+| `GOOGLE_APPLICATION_CREDENTIALS` | path to the `service_account_email` JSON key |
 
 ## Apply
 

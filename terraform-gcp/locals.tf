@@ -6,7 +6,7 @@ locals {
   )
 
   resource_name_prefix = trimspace(var.resource_name_prefix) != "" ? trimspace(var.resource_name_prefix) : "remote-pdf-extractor"
-  name_prefix          = "${local.resource_name_prefix}-${local.environment}"
+  name_prefix          = local.resource_name_prefix
 
   cloud_function_name       = local.name_prefix
   function_source_bucket    = "${local.name_prefix}-function-source-${random_id.function_source_bucket_suffix.hex}"

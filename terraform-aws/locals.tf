@@ -6,7 +6,7 @@ locals {
   )
 
   resource_name_prefix       = trimspace(var.resource_name_prefix) != "" ? trimspace(var.resource_name_prefix) : "remote-pdf-extractor"
-  name_prefix                = "${local.resource_name_prefix}-${local.environment}"
+  name_prefix                = local.resource_name_prefix
   lambda_function_name       = local.name_prefix
   lambda_log_group_name      = "/aws/lambda/${local.lambda_function_name}"
   lambda_execution_role_name = "${local.name_prefix}-lambda-execution-role"

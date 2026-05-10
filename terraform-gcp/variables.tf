@@ -1,17 +1,17 @@
 variable "TFC_WORKSPACE_NAME" {
-  description = "Optional Terraform Cloud workspace name used to derive the environment"
+  description = "Optional workspace name used to derive the environment label"
   type        = string
   default     = ""
 }
 
 variable "resource_name_prefix" {
-  description = "Optional prefix for resource names. Defaults to remote-pdf-extractor."
+  description = "Optional base name for cloud resources. Defaults to remote-pdf-extractor."
   type        = string
   default     = ""
 }
 
 variable "environment" {
-  description = "Explicit environment name. When empty, derive from TFC_WORKSPACE_NAME or fall back to shared."
+  description = "Optional deployment label for resource labels. When empty, derive from TFC_WORKSPACE_NAME or fall back to shared."
   type        = string
   default     = ""
 }
@@ -34,7 +34,7 @@ variable "billing_project_override" {
 }
 
 variable "service_account_email" {
-  description = "Service account email used for Terraform Cloud GOOGLE_CREDENTIALS, Cloud Build, Cloud Function runtime, and function invocation"
+  description = "Service account email used for Terraform credentials, Cloud Build, Cloud Function runtime, and function invocation"
   type        = string
 
   validation {

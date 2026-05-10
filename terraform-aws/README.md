@@ -9,17 +9,17 @@ What this stack sets up:
 - An IAM-authenticated Function URL
 - An optional security group when VPC mode is enabled
 
-Workspace naming:
+Terraform Cloud state:
 
-- Terraform Cloud workspace prefix: `remote-pdf-extractor-aws-`
-- Example: `remote-pdf-extractor-aws-development`
+- Organization: `core-services`
+- Workspace prefix: `remote-pdf-extractor-aws-`
 
 AWS resource naming:
 
-- Base deployment name: `<resource_name_prefix>-<environment>`
-- Lambda function: `<base deployment name>`
-- IAM execution role: `<base deployment name>-lambda-execution-role`
-- VPC security group: `<base deployment name>-lambda-security-group`
+- Lambda function: `remote-pdf-extractor`
+- IAM execution role: `remote-pdf-extractor-lambda-execution-role`
+- VPC security group: `remote-pdf-extractor-lambda-security-group`
+- For multiple deployments in one AWS account, set `resource_name_prefix` to a unique value
 
 Packaging: zip-based (no Docker, no ECR). Terraform deploys the committed `../package/aws-lambda.zip`; it does not install dependencies or create archives during apply. Run `./scripts/build-function-zip.sh` from the repository root before Terraform whenever function source or requirements change.
 
@@ -63,16 +63,16 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_TFC_WORKSPACE_NAME"></a> [TFC\_WORKSPACE\_NAME](#input\_TFC\_WORKSPACE\_NAME) | Optional Terraform Cloud workspace name used to derive the environment | `string` | `""` | no |
+| <a name="input_TFC_WORKSPACE_NAME"></a> [TFC\_WORKSPACE\_NAME](#input\_TFC\_WORKSPACE\_NAME) | Optional workspace name used to derive the environment label | `string` | `""` | no |
 | <a name="input_aws_region"></a> [aws\_region](#input\_aws\_region) | AWS region for the Lambda function | `string` | `"us-west-2"` | no |
-| <a name="input_environment"></a> [environment](#input\_environment) | Explicit environment name. When empty, derive from TFC\_WORKSPACE\_NAME or fall back to shared. | `string` | `""` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Optional deployment label for tags. When empty, derive from TFC\_WORKSPACE\_NAME or fall back to shared. | `string` | `""` | no |
 | <a name="input_environment_variables"></a> [environment\_variables](#input\_environment\_variables) | Additional environment variables passed to the Lambda function | `map(string)` | `{}` | no |
 | <a name="input_lambda_architecture"></a> [lambda\_architecture](#input\_lambda\_architecture) | Lambda CPU architecture | `string` | `"arm64"` | no |
 | <a name="input_lambda_handler"></a> [lambda\_handler](#input\_lambda\_handler) | Lambda handler entry point. Defaults to main.handler so AWS enters through the same shared router as GCP. | `string` | `"main.handler"` | no |
 | <a name="input_lambda_memory_mb"></a> [lambda\_memory\_mb](#input\_lambda\_memory\_mb) | Memory allocated to the Lambda function in MB | `number` | `1024` | no |
 | <a name="input_log_retention_in_days"></a> [log\_retention\_in\_days](#input\_log\_retention\_in\_days) | CloudWatch log retention for the Lambda log group | `number` | `14` | no |
 | <a name="input_python_runtime"></a> [python\_runtime](#input\_python\_runtime) | Lambda Python runtime identifier. This zip-packaging path supports the AL2023 runtimes used by python3.12 and python3.13. | `string` | `"python3.13"` | no |
-| <a name="input_resource_name_prefix"></a> [resource\_name\_prefix](#input\_resource\_name\_prefix) | Optional prefix for AWS resource names. Defaults to remote-pdf-extractor. | `string` | `""` | no |
+| <a name="input_resource_name_prefix"></a> [resource\_name\_prefix](#input\_resource\_name\_prefix) | Optional base name for account-scoped AWS resources. Defaults to remote-pdf-extractor. | `string` | `""` | no |
 | <a name="input_timeout_seconds"></a> [timeout\_seconds](#input\_timeout\_seconds) | Maximum execution time for the Lambda function in seconds | `number` | `120` | no |
 | <a name="input_use_default_vpc"></a> [use\_default\_vpc](#input\_use\_default\_vpc) | Attach the Lambda to the account default VPC when vpc\_id is empty | `bool` | `false` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | Optional VPC ID for Lambda attachment. When empty, no VPC is used unless use\_default\_vpc is true. | `string` | `""` | no |

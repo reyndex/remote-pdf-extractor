@@ -69,7 +69,7 @@ resource "aws_lambda_function" "remote_pdf_extractor" {
 
     precondition {
       condition     = length(local.lambda_function_name) <= 64 && can(regex("^[A-Za-z0-9-_]+$", local.lambda_function_name))
-      error_message = "The Lambda function name must be 64 characters or fewer and contain only letters, numbers, hyphens, or underscores. Adjust resource_name_prefix or environment."
+      error_message = "The Lambda function name must be 64 characters or fewer and contain only letters, numbers, hyphens, or underscores. Adjust resource_name_prefix."
     }
 
     precondition {

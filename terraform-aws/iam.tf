@@ -24,7 +24,7 @@ resource "aws_iam_role" "lambda_execution" {
   lifecycle {
     precondition {
       condition     = length(local.lambda_execution_role_name) <= 64
-      error_message = "The Lambda execution role name must be 64 characters or fewer. Shorten resource_name_prefix or environment."
+      error_message = "The Lambda execution role name must be 64 characters or fewer. Shorten resource_name_prefix."
     }
   }
 }
