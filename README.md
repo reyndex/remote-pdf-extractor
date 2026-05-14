@@ -64,7 +64,9 @@ Format detection is by content signature, not by content type:
 - PDF must start with `%PDF-`
 - DOCX must be a ZIP archive containing `word/document.xml`
 
-Max upload/download size: 20 MB.
+Max app-level file size: 20 MB.
+
+GCP direct uploads can use the full 20 MB app limit. AWS Lambda Function URLs have a smaller synchronous request payload limit, so direct AWS uploads are limited by Lambda before the app sees the request. For larger AWS files, send a `file_url`; the Lambda then downloads the file server-side and applies the 20 MB app limit.
 
 ## Repo layout
 

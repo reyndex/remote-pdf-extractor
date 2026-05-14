@@ -17,7 +17,7 @@ Terraform Cloud state:
 GCP resource naming:
 
 - Cloud Function: `remote-pdf-extractor`
-- Function source bucket: `remote-pdf-extractor-function-source-<random suffix>`
+- Function source bucket: `<gcp_project_id>-remote-pdf-extractor-source`
 - Function source object: `remote-pdf-extractor-source.zip`
 - For multiple deployments in one GCP project, set `resource_name_prefix` to a unique value
 
@@ -33,14 +33,12 @@ For step-by-step setup, see [`../docs/gcp-setup.md`](../docs/gcp-setup.md).
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
 
 ## Providers
 
 | Name | Version |
 | ---- | ------- |
 | <a name="provider_google"></a> [google](#provider\_google) | 7.29.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.8.1 |
 
 ## Modules
 
@@ -59,17 +57,15 @@ No modules.
 | [google_project_service.cloud_storage_api](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 | [google_storage_bucket.function_source](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket) | resource |
 | [google_storage_bucket_object.function_source_archive](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_object) | resource |
-| [random_id.function_source_bucket_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_TFC_WORKSPACE_NAME"></a> [TFC\_WORKSPACE\_NAME](#input\_TFC\_WORKSPACE\_NAME) | Optional workspace name used to derive the environment label | `string` | `""` | no |
 | <a name="input_available_cpu"></a> [available\_cpu](#input\_available\_cpu) | CPU allocated to each Cloud Function instance | `string` | `"1"` | no |
 | <a name="input_available_memory"></a> [available\_memory](#input\_available\_memory) | Memory allocated to each Cloud Function instance | `string` | `"512Mi"` | no |
 | <a name="input_billing_project_override"></a> [billing\_project\_override](#input\_billing\_project\_override) | Optional billing project for the Terraform provider itself when required by your auth setup | `string` | `""` | no |
-| <a name="input_environment"></a> [environment](#input\_environment) | Optional deployment label for resource labels. When empty, derive from TFC\_WORKSPACE\_NAME or fall back to shared. | `string` | `""` | no |
+| <a name="input_environment"></a> [environment](#input\_environment) | Optional deployment label for resource labels. When empty, derive from Terraform workspace or fall back to shared. | `string` | `""` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | Google Cloud project ID where the Cloud Function will be deployed | `string` | n/a | yes |
 | <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | Google Cloud region for the Cloud Function | `string` | `"us-central1"` | no |
 | <a name="input_ingress_settings"></a> [ingress\_settings](#input\_ingress\_settings) | Ingress mode for the Cloud Function HTTP endpoint | `string` | `"ALLOW_ALL"` | no |

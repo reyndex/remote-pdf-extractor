@@ -59,11 +59,11 @@ Run Terraform from:
 terraform-aws/
 ```
 
-Required Terraform variable:
+Common optional variables:
 
 | Variable | Example |
 |---|---|
-| `aws_region` | `us-east-1` |
+| `aws_region` | `us-east-1`; defaults to `us-west-2` |
 
 Required AWS credentials:
 
@@ -73,7 +73,7 @@ Required AWS credentials:
 | `AWS_SECRET_ACCESS_KEY` | secret access key for the IAM identity |
 | `AWS_SESSION_TOKEN` | optional, only for temporary credentials |
 
-Common optional variables:
+Other optional variables:
 
 | Variable | Default |
 |---|---|
@@ -172,6 +172,8 @@ DOCX uploads use the same call shape:
 ```bash
 curl ... --form "file=@resume.docx"
 ```
+
+Lambda Function URLs use Lambda synchronous invocation limits, so direct multipart uploads are limited by AWS before the app sees the request. For larger files, use `file_url`; the Lambda downloads the file server-side and applies the app's 20 MB file limit.
 
 You can also send a generic HTTP(S) download URL instead of uploading bytes:
 

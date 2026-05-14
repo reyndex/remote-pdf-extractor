@@ -1,15 +1,13 @@
 locals {
-  workspace_name = trimspace(var.TFC_WORKSPACE_NAME) != "" ? trimspace(var.TFC_WORKSPACE_NAME) : terraform.workspace
-
   environment = trimspace(var.environment) != "" ? trimspace(var.environment) : (
-    local.workspace_name != "default" ? regex("[^-]+$", local.workspace_name) : "shared"
+    terraform.workspace != "default" ? regex("[^-]+$", terraform.workspace) : "shared"
   )
 
   resource_name_prefix = trimspace(var.resource_name_prefix) != "" ? trimspace(var.resource_name_prefix) : "remote-pdf-extractor"
   name_prefix          = local.resource_name_prefix
 
   cloud_function_name       = local.name_prefix
-  function_source_bucket    = "${local.name_prefix}-function-source-${random_id.function_source_bucket_suffix.hex}"
+  function_source_bucket    = "${var.gcp_project_id}-${local.name_prefix}-source"
   function_source_object    = "${local.cloud_function_name}-source.zip"
   function_source_zip       = abspath("${path.module}/../package/gcp-cloud-function.zip")
   function_source_exists    = fileexists(local.function_source_zip)

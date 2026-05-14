@@ -89,12 +89,3 @@ resource "aws_lambda_function_url" "remote_pdf_extractor" {
   function_name      = aws_lambda_function.remote_pdf_extractor.function_name
   authorization_type = "AWS_IAM"
 }
-
-resource "aws_ssm_parameter" "function_url" {
-  count = local.function_url_ssm_parameter_name != "" ? 1 : 0
-
-  name        = local.function_url_ssm_parameter_name
-  description = "Lambda Function URL for the deployed Remote PDF Extractor"
-  type        = "String"
-  value       = aws_lambda_function_url.remote_pdf_extractor.function_url
-}

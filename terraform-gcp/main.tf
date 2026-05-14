@@ -25,12 +25,6 @@ resource "google_project_service" "cloud_storage_api" {
   disable_on_destroy = false
 }
 
-# ---------- Stable suffixes ----------
-
-resource "random_id" "function_source_bucket_suffix" {
-  byte_length = 3
-}
-
 # ---------- Source bucket ----------
 
 resource "google_storage_bucket" "function_source" {
