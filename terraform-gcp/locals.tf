@@ -19,8 +19,9 @@ locals {
   service_account_resource_name = "projects/${var.gcp_project_id}/serviceAccounts/${local.service_account_email}"
 
   resource_labels = {
+    app         = "reyndex"
     environment = local.environment
+    managed_by  = "terraform"
     service     = local.resource_name_prefix
-    terraform   = "true"
   }
 }

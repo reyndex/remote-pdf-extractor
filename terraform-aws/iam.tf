@@ -16,7 +16,7 @@ resource "aws_iam_role" "lambda_execution" {
   description = "Execution role for the Remote PDF Extractor Lambda"
 
   tags = {
-    Name = local.lambda_execution_role_name
+    name = local.lambda_execution_role_name
   }
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json

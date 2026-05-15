@@ -32,7 +32,7 @@ For step-by-step setup, see [`../docs/aws-setup.md`](../docs/aws-setup.md).
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.15.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
 
 ## Providers
@@ -82,6 +82,7 @@ No modules.
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_function_arn"></a> [function\_arn](#output\_function\_arn) | Lambda function ARN |
 | <a name="output_function_name"></a> [function\_name](#output\_function\_name) | Lambda function name |
 | <a name="output_function_url"></a> [function\_url](#output\_function\_url) | Lambda Function URL |
 <!-- END_TF_DOCS -->

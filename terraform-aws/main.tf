@@ -14,7 +14,7 @@ resource "aws_security_group" "lambda" {
   }
 
   tags = {
-    Name = local.lambda_security_group_name
+    name = local.lambda_security_group_name
   }
 }
 
@@ -23,7 +23,7 @@ resource "aws_cloudwatch_log_group" "lambda" {
   retention_in_days = var.log_retention_in_days
 
   tags = {
-    Name = local.lambda_log_group_name
+    name = local.lambda_log_group_name
   }
 }
 
@@ -58,7 +58,7 @@ resource "aws_lambda_function" "remote_pdf_extractor" {
   }
 
   tags = {
-    Name = local.lambda_function_name
+    name = local.lambda_function_name
   }
 
   lifecycle {

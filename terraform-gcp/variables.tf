@@ -8,6 +8,11 @@ variable "environment" {
   description = "Optional deployment label for resource labels. When empty, derive from Terraform workspace or fall back to shared."
   type        = string
   default     = ""
+
+  validation {
+    condition     = var.environment == "" || contains(["development", "staging", "production"], var.environment)
+    error_message = "environment must be development, staging, or production."
+  }
 }
 
 variable "gcp_project_id" {
