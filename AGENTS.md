@@ -12,10 +12,12 @@ Read these local files before changing behavior, architecture, deployment, or ex
 - `docs/README.md`
 - `docs/gcp-setup.md`
 - `docs/aws-setup.md`
-- `function/core.py`
+- `function/extractor/core.py`
 - `function/main.py`
 - `function/gcp_handler.py`
 - `function/aws_handler.py`
+- `function/extractor/request_payload.py`
+- `function/extractor/remote_file.py`
 - `function/requirements.txt`
 - `scripts/build-function-zip.sh`
 - `terraform-gcp/README.md`
@@ -26,17 +28,18 @@ Read these local files before changing behavior, architecture, deployment, or ex
 - Keep the request/response contract in `README.md` aligned with code. Do not document formats, fields, deployment targets, limits, or auth behavior that do not exist.
 - Remote PDF Extractor owns document extraction only. Do not add caller-specific business workflow, persistence, orchestration, or authorization decisions here.
 - Treat all callers and downstream systems as external integrations. Keep the public request/response contract generic and reusable.
-- Every app-level response uses HTTP `200` with a top-level `status` and `data` envelope. Clients distinguish success and failure through `status`.
+- Every app-level response uses HTTP `200` with a top-level `status` and `data` envelope. Clients distinguish success and failure through `success` / `error` status values.
 - Multipart `file` input takes priority over `file_url` when both are present.
 - Detect formats by file signature, not content type or file extension.
 - Keep the 20 MB app-level file-size limit unless API documentation and deployment constraints are changed together.
 - Preserve documented phone-number behavior: keep leading `+` only when the source contained it; otherwise return digits only.
+- Closed extractor states, document formats, and request fields should use module-owned enums or typed constants. Keep standard HTTP methods, MIME types, headers, URL schemes, Terraform values, and provider/runtime labels inline or local unless repeated validation logic needs a named helper, and preserve exact external wire values.
 - Never log secrets, signed URLs, raw documents, extracted document text, raw email addresses/phone numbers beyond necessary local debugging, or sensitive source material.
 - Build deployment packages when `function/` or `function/requirements.txt` changes, and commit generated `package/` artifacts when the deployment flow consumes them.
 
 ## Repo Shape
 
-- `function/core.py`: shared extraction logic and response shaping
+- `function/extractor/`: shared extraction logic, request parsing, remote download handling, response schema, enums, constants, and error messages
 - `function/main.py`: entry router
 - `function/gcp_handler.py`: Google Cloud Functions request adapter
 - `function/aws_handler.py`: AWS Lambda event adapter

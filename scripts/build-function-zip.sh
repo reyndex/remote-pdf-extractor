@@ -70,6 +70,9 @@ copy_function_source() {
 
   mkdir -p "${target_dir}"
   cp "${FUNCTION_DIR}"/*.py "${target_dir}/"
+  cp -R "${FUNCTION_DIR}/extractor" "${target_dir}/extractor"
+  find "${target_dir}" -type d -name "__pycache__" -prune -exec rm -rf {} +
+  find "${target_dir}" -type f -name "*.pyc" -delete
 }
 
 echo "Cleaning package workspace"

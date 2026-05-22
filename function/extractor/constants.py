@@ -1,0 +1,5 @@
+from __future__ import annotations
+
+MAX_FILE_SIZE = 20 * 1024 * 1024
+MAX_DOCX_UNCOMPRESSED_SIZE = 200 * 1024 * 1024
+ZIP_READ_CHUNK_SIZE = 64 * 1024

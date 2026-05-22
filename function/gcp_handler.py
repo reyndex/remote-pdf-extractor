@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import functions_framework
-from core import MAX_FILE_SIZE, error_payload, normalize_content_type, process_upload
-from flask import jsonify
-from remote_file import RemoteFileError, download_file_url
-from request_payload import (
-    MISSING_FILE_MESSAGE,
-    POST_INSTRUCTIONS,
+from extractor.constants import MAX_FILE_SIZE
+from extractor.core import error_payload, normalize_content_type, process_upload
+from extractor.enums import UploadRequestField
+from extractor.errors import MISSING_FILE_MESSAGE, POST_INSTRUCTIONS
+from extractor.remote_file import RemoteFileError, download_file_url
+from extractor.request_payload import (
     file_url_from_json_body,
     file_url_from_mapping,
 )
+from flask import jsonify
 
 
 def _file_url_from_request(request, normalized_content_type: str) -> str | None:
@@ -40,7 +41,7 @@ def extract_document(request):
 
     normalized_content_type = normalize_content_type(request.content_type)
     if normalized_content_type == "multipart/form-data":
-        uploaded_file = request.files.get("file")
+        uploaded_file = request.files.get(UploadRequestField.FILE.value)
         if uploaded_file is not None:
             return jsonify(
                 process_upload(uploaded_file.read(), uploaded_file.content_type)

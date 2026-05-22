@@ -70,7 +70,7 @@ GCP direct uploads can use the full 20 MB app limit. AWS Lambda Function URLs ha
 
 ## Repo layout
 
-- `function/` — Shared core (`core.py`) + platform handlers (`gcp_handler.py`, `aws_handler.py`) + entry router (`main.py`)
+- `function/` — Platform handlers (`gcp_handler.py`, `aws_handler.py`) + entry router (`main.py`) + shared extractor package (`extractor/`)
 - `scripts/build-function-zip.sh` — Local package builder for both deployment targets
 - `package/` — Committed deployment zips consumed directly by Terraform
 - `terraform-gcp/` — GCP Cloud Functions deployment from `package/gcp-cloud-function.zip`

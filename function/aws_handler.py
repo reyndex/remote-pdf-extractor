@@ -5,18 +5,25 @@ import binascii
 import json
 from typing import Any
 
-from core import MAX_FILE_SIZE, error_payload, normalize_content_type, process_upload
-from remote_file import RemoteFileError, download_file_url
-from request_payload import (
+from extractor.constants import MAX_FILE_SIZE
+from extractor.core import error_payload, normalize_content_type, process_upload
+from extractor.errors import (
+    INVALID_BASE64_BODY_MESSAGE,
+    INVALID_REQUEST_BODY_MESSAGE,
+    INVALID_REQUEST_EVENT_MESSAGE,
     MISSING_FILE_MESSAGE,
     POST_INSTRUCTIONS,
+)
+from extractor.remote_file import RemoteFileError, download_file_url
+from extractor.request_payload import (
     file_url_from_json_body,
     file_url_from_urlencoded_body,
     parse_multipart_upload,
 )
+from extractor.response_schema import ExtractionResponse
 
 
-def _lambda_response(payload: dict[str, Any]) -> dict[str, Any]:
+def _lambda_response(payload: ExtractionResponse) -> dict[str, Any]:
     return {
         "statusCode": 200,
         "headers": {
@@ -56,12 +63,12 @@ def _header_value(headers: object, name: str) -> str:
 def _decode_body(event: dict[str, Any]) -> bytes:
     body = event.get("body", "")
     if not isinstance(body, str):
-        raise ValueError("Invalid request body")
+        raise ValueError(INVALID_REQUEST_BODY_MESSAGE)
     if event.get("isBase64Encoded"):
         try:
             return base64.b64decode(body, validate=True)
         except (binascii.Error, ValueError) as exc:
-            raise ValueError("Invalid base64-encoded request body") from exc
+            raise ValueError(INVALID_BASE64_BODY_MESSAGE) from exc
     return body.encode("utf-8")
 
 
@@ -77,7 +84,7 @@ def _process_file_url(file_url: str) -> dict[str, Any]:
 
 def handler(event, _context):
     if not isinstance(event, dict):
-        return _lambda_response(error_payload("Invalid request event"))
+        return _lambda_response(error_payload(INVALID_REQUEST_EVENT_MESSAGE))
 
     if _request_method(event) != "POST":
         return _lambda_response(error_payload(POST_INSTRUCTIONS))
