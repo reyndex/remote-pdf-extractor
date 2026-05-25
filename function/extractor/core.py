@@ -22,7 +22,7 @@ from extractor.constants import (
     MAX_FILE_SIZE,
     ZIP_READ_CHUNK_SIZE,
 )
-from extractor.enums import DocumentFormat, ExtractionResultStatus
+from extractor.enums import DocumentFormat, ExtractionErrorCode
 from extractor.errors import (
     EMPTY_FILE_MESSAGE,
     EXTRACTION_FAILED_MESSAGE,
@@ -73,17 +73,27 @@ def normalize_content_type(content_type: str | None) -> str:
     return (content_type or "").split(";", 1)[0].strip().lower()
 
 
-def error_payload(message: str) -> ExtractionResponse:
+def error_payload(
+    message: str,
+    *,
+    code: ExtractionErrorCode = ExtractionErrorCode.INVALID_REQUEST,
+) -> ExtractionResponse:
     return {
-        "status": ExtractionResultStatus.ERROR,
-        "data": message,
+        "ok": False,
+        "data": None,
+        "error": {
+            "code": code,
+            "message": message,
+            "details": {},
+        },
     }
 
 
 def success_payload(data: ExtractionData) -> ExtractionResponse:
     return {
-        "status": ExtractionResultStatus.SUCCESS,
+        "ok": True,
         "data": data,
+        "error": None,
     }
 
 
@@ -107,19 +117,42 @@ def _is_docx_zip(file_bytes: bytes) -> bool:
 
 def process_upload(file_bytes: bytes, content_type: str | None) -> ExtractionResponse:
     if len(file_bytes) == 0:
-        return error_payload(EMPTY_FILE_MESSAGE)
+        return error_payload(
+            EMPTY_FILE_MESSAGE,
+            code=ExtractionErrorCode.EMPTY_FILE,
+        )
     if len(file_bytes) > MAX_FILE_SIZE:
-        return error_payload(file_too_large_message())
+        return error_payload(
+            file_too_large_message(),
+            code=ExtractionErrorCode.FILE_TOO_LARGE,
+        )
     document_format = detect_format(file_bytes)
     if document_format is None:
-        return error_payload(unsupported_file_message(content_type))
+        return error_payload(
+            unsupported_file_message(content_type),
+            code=ExtractionErrorCode.UNSUPPORTED_DOCUMENT_FORMAT,
+        )
     try:
         return success_payload(_extract_document(file_bytes, document_format))
     except ValueError as exc:
-        return error_payload(str(exc))
+        message = str(exc)
+        if message == docx_archive_too_large_message():
+            code = ExtractionErrorCode.FILE_TOO_LARGE
+        elif message in {
+            INVALID_DOCX_ARCHIVE_MESSAGE,
+            extraction_format_failed_message(DocumentFormat.PDF.value),
+            extraction_format_failed_message(DocumentFormat.DOCX.value),
+        }:
+            code = ExtractionErrorCode.MALFORMED_FILE
+        else:
+            code = ExtractionErrorCode.EXTRACTION_FAILED
+        return error_payload(message, code=code)
     except Exception:
         logger.exception(EXTRACTION_FAILED_MESSAGE)
-        return error_payload(EXTRACTION_FAILED_MESSAGE)
+        return error_payload(
+            EXTRACTION_FAILED_MESSAGE,
+            code=ExtractionErrorCode.EXTRACTION_FAILED,
+        )
 
 
 def _unique_preserving_order(values: list[str]) -> list[str]:

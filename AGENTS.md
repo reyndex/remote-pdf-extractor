@@ -28,7 +28,7 @@ Read these local files before changing behavior, architecture, deployment, or ex
 - Keep the request/response contract in `README.md` aligned with code. Do not document formats, fields, deployment targets, limits, or auth behavior that do not exist.
 - Remote PDF Extractor owns document extraction only. Do not add caller-specific business workflow, persistence, orchestration, or authorization decisions here.
 - Treat all callers and downstream systems as external integrations. Keep the public request/response contract generic and reusable.
-- Every app-level response uses HTTP `200` with a top-level `status` and `data` envelope. Clients distinguish success and failure through `success` / `error` status values.
+- Every app-level response uses the standard `{ ok, data, error }` envelope and includes an `X-Request-Id` response header. Successful responses use HTTP `200`; application errors use this service's documented error status set.
 - Multipart `file` input takes priority over `file_url` when both are present.
 - Detect formats by file signature, not content type or file extension.
 - Keep the 20 MB app-level file-size limit unless API documentation and deployment constraints are changed together.

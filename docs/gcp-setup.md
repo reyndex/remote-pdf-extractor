@@ -164,10 +164,11 @@ with open("document.pdf", "rb") as f:
         headers={"Authorization": f"Bearer {token}"},
         timeout=120,
     )
-response.raise_for_status()
+if response.status_code not in (200, 400, 500):
+    response.raise_for_status()
 result = response.json()
-if result["status"] == "error":
-    raise SystemExit(result["data"])
+if not result["ok"]:
+    raise SystemExit(result["error"]["message"])
 
 data = result["data"]
 print("markdown chars:", len(data["markdown"]))

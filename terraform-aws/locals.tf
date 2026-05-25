@@ -22,7 +22,7 @@ locals {
 
   tags = {
     environment = local.environment
-    product     = "reyndex"
+    product     = local.resource_name_prefix
     service     = local.resource_name_prefix
     terraform   = "true"
   }

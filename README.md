@@ -9,7 +9,7 @@ Two deployment targets:
 
 ## Response shape
 
-POST a PDF or DOCX as multipart form field `file`, or provide a generic HTTP(S) download URL in `file_url` as a JSON body or form field. When both are present, the multipart `file` upload is used. Every response is HTTP 200 with a `status` + `data` envelope; clients distinguish by the `status` field.
+POST a PDF or DOCX as multipart form field `file`, or provide a generic HTTP(S) download URL in `file_url` as a JSON body or form field. When both are present, the multipart `file` upload is used. Responses use the standard `{ ok, data, error }` envelope and include an `X-Request-Id` response header. Successful responses use HTTP `200`; malformed input and unsupported files use HTTP `400`; unexpected extraction failures use HTTP `500`.
 
 Direct upload:
 
@@ -30,24 +30,32 @@ On success, `data` is the extraction object:
 
 ```json
 {
-  "status": "success",
+  "ok": true,
   "data": {
     "markdown": "...",
     "email_addresses": ["foo@bar.com"],
     "link_urls": ["https://github.com/foo"],
     "phone_numbers": ["+15551234567", "3365005405"]
+  },
+  "error": null
+}
+```
+
+On failure, `data` is `null` and `error` describes the problem:
+
+```json
+{
+  "ok": false,
+  "data": null,
+  "error": {
+    "code": "unsupported_document_format",
+    "message": "Unsupported file: expected PDF or DOCX",
+    "details": {}
   }
 }
 ```
 
-On failure, `data` is the error message:
-
-```json
-{
-  "status": "error",
-  "data": "Unsupported file: expected PDF or DOCX"
-}
-```
+Malformed or corrupt PDF/DOCX files return `error.code: "malformed_file"` with HTTP `400`.
 
 Phone format: preserve leading `+` only when source contained it; otherwise return digits only with punctuation stripped.
 

@@ -3,10 +3,12 @@ from __future__ import annotations
 import base64
 import binascii
 import json
+import uuid
 from typing import Any
 
 from extractor.constants import MAX_FILE_SIZE
 from extractor.core import error_payload, normalize_content_type, process_upload
+from extractor.enums import ExtractionErrorCode
 from extractor.errors import (
     INVALID_BASE64_BODY_MESSAGE,
     INVALID_REQUEST_BODY_MESSAGE,
@@ -20,14 +22,15 @@ from extractor.request_payload import (
     file_url_from_urlencoded_body,
     parse_multipart_upload,
 )
-from extractor.response_schema import ExtractionResponse
+from extractor.response_schema import ExtractionResponse, http_status_code_for_response
 
 
 def _lambda_response(payload: ExtractionResponse) -> dict[str, Any]:
     return {
-        "statusCode": 200,
+        "statusCode": http_status_code_for_response(payload),
         "headers": {
             "content-type": "application/json",
+            "X-Request-Id": str(uuid.uuid4()),
         },
         "body": json.dumps(payload),
     }
@@ -72,13 +75,16 @@ def _decode_body(event: dict[str, Any]) -> bytes:
     return body.encode("utf-8")
 
 
-def _process_file_url(file_url: str) -> dict[str, Any]:
+def _process_file_url(file_url: str) -> ExtractionResponse:
     try:
         file_bytes, content_type = download_file_url(
             file_url, max_file_size=MAX_FILE_SIZE
         )
     except RemoteFileError as exc:
-        return error_payload(str(exc))
+        return error_payload(
+            str(exc),
+            code=ExtractionErrorCode.REMOTE_FILE_DOWNLOAD_FAILED,
+        )
     return process_upload(file_bytes, content_type)
 
 
@@ -104,14 +110,24 @@ def handler(event, _context):
         elif upload.file_url is not None:
             return _lambda_response(_process_file_url(upload.file_url))
         else:
-            return _lambda_response(error_payload(MISSING_FILE_MESSAGE))
+            return _lambda_response(
+                error_payload(
+                    MISSING_FILE_MESSAGE,
+                    code=ExtractionErrorCode.MISSING_FILE,
+                )
+            )
     elif normalized_content_type == "application/json":
         try:
             file_url = file_url_from_json_body(body)
         except ValueError as exc:
             return _lambda_response(error_payload(str(exc)))
         if file_url is None:
-            return _lambda_response(error_payload(MISSING_FILE_MESSAGE))
+            return _lambda_response(
+                error_payload(
+                    MISSING_FILE_MESSAGE,
+                    code=ExtractionErrorCode.MISSING_FILE,
+                )
+            )
         return _lambda_response(_process_file_url(file_url))
     elif normalized_content_type == "application/x-www-form-urlencoded":
         try:
@@ -119,7 +135,12 @@ def handler(event, _context):
         except ValueError as exc:
             return _lambda_response(error_payload(str(exc)))
         if file_url is None:
-            return _lambda_response(error_payload(MISSING_FILE_MESSAGE))
+            return _lambda_response(
+                error_payload(
+                    MISSING_FILE_MESSAGE,
+                    code=ExtractionErrorCode.MISSING_FILE,
+                )
+            )
         return _lambda_response(_process_file_url(file_url))
     else:
         file_bytes = body
