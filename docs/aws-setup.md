@@ -61,9 +61,9 @@ terraform-aws/
 
 Common optional variables:
 
-| Variable | Example |
+| Variable | Default |
 |---|---|
-| `aws_region` | `us-east-1`; defaults to `us-west-2` |
+| `aws_region` | `us-west-2` |
 
 Required AWS credentials:
 
@@ -150,7 +150,7 @@ The invoking IAM identity can be the same identity used for deployment or a sepa
 Set:
 
 ```bash
-export AWS_REGION=us-east-1
+export AWS_REGION=us-west-2
 export FUNCTION_URL="$(terraform -chdir=terraform-aws output -raw function_url)"
 ```
 

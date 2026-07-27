@@ -36,6 +36,7 @@ Read these local files before changing behavior, architecture, deployment, or ex
 - Closed extractor states, document formats, and request fields should use module-owned enums or typed constants. Keep standard HTTP methods, MIME types, headers, URL schemes, Terraform values, and provider/runtime labels inline or local unless repeated validation logic needs a named helper, and preserve exact external wire values.
 - Never log secrets, signed URLs, raw documents, extracted document text, raw email addresses/phone numbers beyond necessary local debugging, or sensitive source material.
 - Build deployment packages when `function/` or `function/requirements.txt` changes, and commit generated `package/` artifacts when the deployment flow consumes them.
+- Keep the default deployment regions and setup examples aligned on AWS `us-west-2` and GCP `us-west1` unless intentionally documenting a regional exception.
 
 ## Repo Shape
 

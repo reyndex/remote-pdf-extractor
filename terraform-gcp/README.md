@@ -67,7 +67,7 @@ No modules.
 | <a name="input_billing_project_override"></a> [billing\_project\_override](#input\_billing\_project\_override) | Optional billing project for the Terraform provider itself when required by your auth setup | `string` | `""` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Optional deployment label for resource labels. When empty, derive from Terraform workspace or fall back to shared. | `string` | `""` | no |
 | <a name="input_gcp_project_id"></a> [gcp\_project\_id](#input\_gcp\_project\_id) | Google Cloud project ID where the Cloud Function will be deployed | `string` | n/a | yes |
-| <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | Google Cloud region for the Cloud Function | `string` | `"us-central1"` | no |
+| <a name="input_gcp_region"></a> [gcp\_region](#input\_gcp\_region) | Google Cloud region for the Cloud Function | `string` | `"us-west1"` | no |
 | <a name="input_ingress_settings"></a> [ingress\_settings](#input\_ingress\_settings) | Ingress mode for the Cloud Function HTTP endpoint | `string` | `"ALLOW_ALL"` | no |
 | <a name="input_max_instance_count"></a> [max\_instance\_count](#input\_max\_instance\_count) | Maximum number of Cloud Function instances | `number` | `10` | no |
 | <a name="input_min_instance_count"></a> [min\_instance\_count](#input\_min\_instance\_count) | Minimum number of Cloud Function instances (0 = scale to zero) | `number` | `0` | no |

@@ -88,7 +88,7 @@ Common optional variables:
 
 | Variable | Default |
 |---|---|
-| `gcp_region` | `us-central1` |
+| `gcp_region` | `us-west1` |
 | `ingress_settings` | `ALLOW_ALL` |
 | `resource_name_prefix` | `remote-pdf-extractor` |
 | `environment` | `shared`; optional resource label |

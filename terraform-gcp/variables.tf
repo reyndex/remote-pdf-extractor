@@ -23,7 +23,7 @@ variable "gcp_project_id" {
 variable "gcp_region" {
   description = "Google Cloud region for the Cloud Function"
   type        = string
-  default     = "us-central1"
+  default     = "us-west1"
 }
 
 variable "billing_project_override" {
