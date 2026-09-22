@@ -1,5 +1,7 @@
 # Remote PDF Extractor — agent rules
 
+Use the [local documentation rules](docs/guidelines/README.md) for source verification, instruction parity, and shared-policy maintenance.
+
 Read [README.md](README.md) for the public contract and the relevant [AWS](docs/aws-setup.md) or [GCP](docs/gcp-setup.md) guide for deployment.
 
 - This is a reusable extraction service. Keep caller business rules, persistence, authorization decisions, and LLM orchestration outside it.
@@ -52,8 +54,8 @@ Do not require both cloud deployments for a prose edit. Keep public examples gen
 
 ## Validation
 
-Follow the [testing policy](../docs/guidelines/reyndex-testing-guidelines.md): a test must protect a plausible consequential product failure and add distinct protection.
+Follow the [testing policy](docs/guidelines/reyndex-testing-guidelines.md): a test must protect a plausible consequential product failure and add distinct protection.
 
 This repo has no automated test suite today: there is no `tests/` directory and no test runner configuration. Lint config is `pyproject.toml` ruff (`E,F,I`, line 88, target `py311`); `--no-project` is required because there is no `[project]` table. `uv run --no-project --with ruff ruff check .` is the only repository check, and `./scripts/build-function-zip.sh` is required after runtime/dependency changes. No CI is configured in this repo; the listed commands are the only gates. Verification for a parser/adapter change is focused manual exercise of the handler against representative PDF/DOCX input plus a package rebuild; report the platform or live-auth proof that remains unperformed. Documentation-only changes need link checks and `AGENTS.md`/`CLAUDE.md` parity.
 
-The consequential risks here are unbounded downloads, unsafe archive expansion, lost-document/contact regressions, broken platform envelopes, and packaging. Introducing a test runner is a deliberate decision to make only when a change creates such a risk under the root admission rule, never a per-change default.
+The consequential risks here are unbounded downloads, unsafe archive expansion, lost-document/contact regressions, broken platform envelopes, and packaging. Introducing a test runner is a deliberate decision to make only when a change creates such a risk under the local testing policy's admission rule, never a per-change default.
