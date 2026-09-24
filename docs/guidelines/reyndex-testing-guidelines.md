@@ -1,6 +1,6 @@
 # Testing policy
 
-_Shared Reyndex guideline. Versioned source: `backend/docs/guidelines/reyndex-testing-guidelines.md`. Identical copies: `mcp-gateway`, `brand-system`, `website`, `candidate-engine`, `infrastructure`, `notion-enrichment-engine`, `formula-engine`, `worker-autoscaler`, `ai-enrichment-engine`, `web-app`, `remote-pdf-extractor`, `backend`. Source attribution is informational; this copy contains the required rules. Last synced 2026-09-22._
+_Shared Reyndex guideline. Versioned source: `backend/docs/guidelines/reyndex-testing-guidelines.md`. Identical copies: `mcp-gateway`, `brand-system`, `website`, `candidate-engine`, `infrastructure`, `notion-enrichment-engine`, `formula-engine`, `worker-autoscaler`, `ai-enrichment-engine`, `web-app`, `remote-pdf-extractor`, `backend`. Source attribution is informational; this copy contains the required rules. Last synced 2026-09-24._
 
 Tests protect critical product behavior. They are not a checklist for every function, branch, input variation, or code change. Deliberately leave low-impact implementation details without dedicated tests.
 
@@ -35,6 +35,8 @@ Test these at the smallest scope that exposes the risk. A critical calculation m
 Judge exceptions by consequence, not syntax. An HMAC payload, persisted identifier, permission string, or FIFO order can control security or durable work and merit focused protection. Ordinary string manipulation or array order does not. Do not use “contract” to justify asserting every property or inventing hypothetical risks for trivial code.
 
 ## Test design and pruning
+
+Before adding a test, inspect existing coverage for the same failure. Extend an existing test when appropriate. Each additional scenario, whether a separate test, parameter row, or loop case, must add distinct protection against a consequential failure, such as bypassing a security guard or breaking a recovery path, even when the asserted result is the same. A new enum value, error code, or configuration entry handled by an existing path does not, by itself, justify another case. Avoid Cartesian products of equivalent cases.
 
 Assert externally observable outcomes with independent expected values. Cover materially different critical success, rejection, and recovery paths; use representative cases instead of exhaustive permutations. Reuse existing fixtures and tools. Mock external dependencies where useful, but verify consequential producer/consumer compatibility against real schemas or implementations; matching hand-written mocks proves neither side.
 
