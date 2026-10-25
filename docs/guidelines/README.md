@@ -1,10 +1,10 @@
 # Repository documentation rules
 
-_Shared Reyndex guideline. Versioned source: `backend/docs/guidelines/README.md`. An identical copy is maintained in all twelve Reyndex repositories. Last synced 2026-09-22._
+_Shared Reyndex guideline. Versioned source: [reyndex/backend](https://github.com/reyndex/backend/blob/main/docs/guidelines/README.md). Identical copies: `web-app`, `website`, `brand-system`, `mcp-gateway`, `candidate-engine`, `ai-enrichment-engine`, `notion-enrichment-engine`, `remote-pdf-extractor`, `formula-engine`, `worker-autoscaler`, `infrastructure`. Source attribution is informational; this copy contains the required rules. Last synced 2026-10-24._
 
 ## Local authority
 
-The repository's `AGENTS.md` and identical `CLAUDE.md` are its entry point. They select the local contracts and guidelines relevant to the task. Required instructions must be available in this clone; workspace-root files, personal configuration, installed skills, and another repository's agent guide are not prerequisites.
+The repository's `AGENTS.md` is its entry point. It selects the local contracts and guidelines relevant to the task. Required instructions must be available in this clone; workspace-root files, personal configuration, installed skills, and another repository's agent guide are not prerequisites.
 
 Keep ownership and coordination requirements explicit. A cross-repository contract change still requires comparing the actual producers and consumers; a local policy copy is not evidence that another implementation is compatible. External links may provide attribution or optional implementation context.
 
@@ -20,4 +20,4 @@ Verify descriptive claims and example commands against source. Distinguish polic
 
 Source labels identify version-controlled policy owners; they are not instructions to fetch more rules. Synchronize intentional shared copies when changing their rules, refresh the sync date, and keep their content identical. Put repository-specific links in the local guide or index. Brand documents identify their canonical files and consumer copies in the same way. Do not make different repositories' agent guides identical.
 
-Apply the local [testing policy](reyndex-testing-guidelines.md). Documentation-only changes need source/reference checks, local links and anchors, guide-pair parity, shared-copy parity, and diff checks. Report unsynchronized consumers or unavailable integration evidence; do not claim validation that was not performed.
+Apply the local [testing policy](reyndex-testing-guidelines.md). Documentation-only changes need source/reference checks, local links and anchors, shared-copy parity, and diff checks. Report unsynchronized consumers or unavailable integration evidence; do not claim validation that was not performed.

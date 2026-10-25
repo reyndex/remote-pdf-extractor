@@ -1,6 +1,6 @@
 # Testing policy
 
-_Shared Reyndex guideline. Versioned source: `backend/docs/guidelines/reyndex-testing-guidelines.md`. Identical copies: `mcp-gateway`, `brand-system`, `website`, `candidate-engine`, `infrastructure`, `notion-enrichment-engine`, `formula-engine`, `worker-autoscaler`, `ai-enrichment-engine`, `web-app`, `remote-pdf-extractor`, `backend`. Source attribution is informational; this copy contains the required rules. Last synced 2026-09-24._
+_Shared Reyndex guideline. Versioned source: [reyndex/backend](https://github.com/reyndex/backend/blob/main/docs/guidelines/reyndex-testing-guidelines.md). Identical copies: `web-app`, `website`, `brand-system`, `mcp-gateway`, `candidate-engine`, `ai-enrichment-engine`, `notion-enrichment-engine`, `remote-pdf-extractor`, `formula-engine`, `worker-autoscaler`, `infrastructure`. Source attribution is informational; this copy contains the required rules. Last synced 2026-10-24._
 
 Tests protect critical product behavior. They are not a checklist for every function, branch, input variation, or code change. Deliberately leave low-impact implementation details without dedicated tests.
 
@@ -46,7 +46,7 @@ No test-count, coverage-percentage, or mutation-score targets. Use coverage or m
 
 ## What to run
 
-- Documentation-only changes: check accuracy, references, instruction parity, and diffs. No application build or full test suite solely for prose changes.
+- Documentation-only changes: check accuracy, references, shared-copy consistency, and diffs. No application build or full test suite solely for prose changes.
 - Localized code changes: run the affected meaningful tests and applicable lint/type checks; broaden when shared behavior or failures warrant it.
 - Shared foundations, cross-repo contracts, or broad refactors: run the relevant broader suites on affected producers and consumers. Run builds when packaging, compilation, routing, or deployment output is at risk.
 - Existing mandatory CI/release gates still apply. Do not bypass or weaken them. A command list documents available checks; it does not require every command after every edit.
